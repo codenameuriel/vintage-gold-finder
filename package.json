@@ -1,0 +1,19 @@
+{
+  "name": "vintage-gold-finder",
+  "version": "1.0.0",
+  "description": "A web scraper tool for hunting down deals on vintage gold jewelry.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codenameuriel/vintage-gold-finder.git"
+  },
+  "author": "Uriel Rodriguez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/codenameuriel/vintage-gold-finder/issues"
+  },
+  "homepage": "https://github.com/codenameuriel/vintage-gold-finder#readme"
+}
