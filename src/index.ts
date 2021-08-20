@@ -22,17 +22,21 @@ const init = async () => {
 
     await page.goto('https://etsy.com/search/vintage?q=gold+jewelry');
 
-    const aTagHrefs = await page.$$eval('a.listing-link', (aTags) =>
-      aTags.map((aTag) => (aTag as HTMLAnchorElement).href)
+    const aTagHrefs = await page.$$eval('a.listing-link', aTags =>
+      aTags.map(aTag => (aTag as HTMLAnchorElement).href)
     );
     // console.log(aTagHrefs, aTagHrefs.length);
 
     // filter out the '?version=[0-9]' characters from the end of the string
-    const imgTagSources = await page.$$eval(
-      'img[data-listing-card-listing-image]',
-      (imgTags) => imgTags.map((imgTag) => (imgTag as HTMLImageElement).src.split(/\?version=[0-9]\b/)[0])
+    const imgTagSources = await page.$$eval('img[data-listing-card-listing-image]', imgTags =>
+      imgTags.map(imgTag => (imgTag as HTMLImageElement).src.split(/\?version=[0-9]\b/)[0])
     );
     // console.log(imgTagSources, imgTagSources.length);
+
+    const h3TagInnerTexts = await page.$$eval('div[class^="v2-listing-card__info"] > div > h3', h3Tags => 
+      h3Tags.map(h3Tag => (h3Tag as HTMLHeadingElement).innerText)
+    );
+    // console.log(h3TagInnerTexts, h3TagInnerTexts.length);
 
     await browser.close();
     await chrome.kill();

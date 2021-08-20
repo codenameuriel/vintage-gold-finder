@@ -48,11 +48,13 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
         isConnected && console.log('Connected to browser...');
         const page = yield browser.newPage();
         yield page.goto('https://etsy.com/search/vintage?q=gold+jewelry');
-        const aTagHrefs = yield page.$$eval('a.listing-link', (aTags) => aTags.map((aTag) => aTag.href));
+        const aTagHrefs = yield page.$$eval('a.listing-link', aTags => aTags.map(aTag => aTag.href));
         // console.log(aTagHrefs, aTagHrefs.length);
         // filter out the '?version=[0-9]' characters from the end of the string
-        const imgTagSources = yield page.$$eval('img[data-listing-card-listing-image]', (imgTags) => imgTags.map((imgTag) => imgTag.src.split(/\?version=[0-9]\b/)[0]));
+        const imgTagSources = yield page.$$eval('img[data-listing-card-listing-image]', imgTags => imgTags.map(imgTag => imgTag.src.split(/\?version=[0-9]\b/)[0]));
         // console.log(imgTagSources, imgTagSources.length);
+        const h3TagInnerTexts = yield page.$$eval('div[class^="v2-listing-card__info"] > div > h3', h3Tags => h3Tags.map(h3Tag => h3Tag.innerText));
+        // console.log(h3TagInnerTexts, h3TagInnerTexts.length);
         yield browser.close();
         yield chrome.kill();
     }
