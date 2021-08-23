@@ -47,16 +47,22 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
         const isConnected = browser.isConnected();
         isConnected && console.log('Connected to browser...');
         const page = yield browser.newPage();
+        // allow page unlimited time to load
+        yield page.setDefaultNavigationTimeout(0);
+        yield page.setViewport({
+            width: 1200,
+            height: 1200,
+            deviceScaleFactor: 1
+        });
         yield page.goto('https://etsy.com/search/vintage?q=gold+jewelry');
-        const aTagHrefs = yield page.$$eval('a.listing-link', aTags => aTags.map(aTag => aTag.href));
-        // console.log(aTagHrefs, aTagHrefs.length);
+        const productLinks = yield page.$$eval('div[class~=search-listing-card--desktop] > a.listing-link', (aTags) => aTags.map((aTag) => aTag.href));
         // filter out the '?version=[0-9]' characters from the end of the string
-        const imgTagSources = yield page.$$eval('img[data-listing-card-listing-image]', imgTags => imgTags.map(imgTag => imgTag.src.split(/\?version=[0-9]\b/)[0]));
-        // console.log(imgTagSources, imgTagSources.length);
-        const h3TagInnerTexts = yield page.$$eval('div[class^="v2-listing-card__info"] > div > h3', h3Tags => h3Tags.map(h3Tag => h3Tag.innerText));
-        // console.log(h3TagInnerTexts, h3TagInnerTexts.length);
-        yield browser.close();
-        yield chrome.kill();
+        const productImages = yield page.$$eval('img[data-listing-card-listing-image]', (imgTags) => imgTags.map((imgTag) => imgTag.src.split(/\?version=[0-9]\b/)[0]));
+        const productNames = yield page.$$eval('div[class^="v2-listing-card__info"] > div > h3', (h3Tags) => h3Tags.map((h3Tag) => h3Tag.innerText));
+        // use css 'or' operator to select either available span element
+        const productPrices = yield page.$$eval('p.wt-text-title-01 > span[aria-hidden="true"] > span.currency-value, p.wt-text-title-01 > span.currency-value', (spanTags) => spanTags.map((spanTag) => spanTag.innerText));
+        // await browser.close();
+        // await chrome.kill();
     }
     catch (err) {
         console.error(err);
