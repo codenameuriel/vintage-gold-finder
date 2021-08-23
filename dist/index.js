@@ -61,8 +61,8 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
         const productNames = yield page.$$eval('div[class^="v2-listing-card__info"] > div > h3', (h3Tags) => h3Tags.map((h3Tag) => h3Tag.innerText));
         // use css 'or' operator to select either available span element
         const productPrices = yield page.$$eval('p.wt-text-title-01 > span[aria-hidden="true"] > span.currency-value, p.wt-text-title-01 > span.currency-value', (spanTags) => spanTags.map((spanTag) => spanTag.innerText));
-        // await browser.close();
-        // await chrome.kill();
+        yield browser.close();
+        yield chrome.kill();
     }
     catch (err) {
         console.error(err);

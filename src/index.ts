@@ -59,8 +59,8 @@ const init = async () => {
         spanTags.map((spanTag) => (spanTag as HTMLSpanElement).innerText)
     );
 
-    // await browser.close();
-    // await chrome.kill();
+    await browser.close();
+    await chrome.kill();
   } catch (err) {
     console.error(err);
   }
