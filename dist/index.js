@@ -47,8 +47,11 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
         const isConnected = browser.isConnected();
         isConnected && console.log('Connected to browser...');
         const page = yield browser.newPage();
+        const pages = yield browser.pages();
+        // close default blank about page
+        pages[0].close();
         // allow page unlimited time to load
-        yield page.setDefaultNavigationTimeout(0);
+        // await page.setDefaultNavigationTimeout(0);
         yield page.setViewport({
             width: 1200,
             height: 1200,
@@ -56,11 +59,28 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
         });
         yield page.goto('https://etsy.com/search/vintage?q=gold+jewelry');
         const productLinks = yield page.$$eval('div[class~=search-listing-card--desktop] > a.listing-link', (aTags) => aTags.map((aTag) => aTag.href));
+        // console.log(productLinks, productLinks.length)
         // filter out the '?version=[0-9]' characters from the end of the string
         const productImages = yield page.$$eval('img[data-listing-card-listing-image]', (imgTags) => imgTags.map((imgTag) => imgTag.src.split(/\?version=[0-9]\b/)[0]));
+        // console.log(productImages, productImages.length)
         const productNames = yield page.$$eval('div[class^="v2-listing-card__info"] > div > h3', (h3Tags) => h3Tags.map((h3Tag) => h3Tag.innerText));
+        // console.log(productNames, productNames.length)
         // use css 'or' operator to select either available span element
         const productPrices = yield page.$$eval('p.wt-text-title-01 > span[aria-hidden="true"] > span.currency-value, p.wt-text-title-01 > span.currency-value', (spanTags) => spanTags.map((spanTag) => spanTag.innerText));
+        // console.log(productPrices, productPrices.length);
+        const productDetails = [];
+        // TESTING
+        for (let link of productLinks) {
+            const productPage = yield browser.newPage();
+            productPage.goto(link);
+            yield productPage.waitForNavigation();
+            const pages = yield browser.pages();
+            const detail = yield pages[pages.length - 1].$$eval('ul[class^="wt-text-body-01 jewelry-attributes"] > li > div', (divs) => divs.map((d) => d.innerText));
+            productDetails.push(detail);
+            productPage.close();
+        }
+        console.log('total product links:', productLinks.length);
+        console.log(productDetails, productDetails.length);
         yield browser.close();
         yield chrome.kill();
     }
