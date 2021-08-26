@@ -5,7 +5,7 @@ import axios from 'axios';
 const init = async () => {
   try {
     const chrome = await ChromeLauncher.launch({
-      // chromeFlags: ['--headless']
+      chromeFlags: ['--headless']
     });
 
     const response = await axios.get(
@@ -79,19 +79,21 @@ const init = async () => {
       productPage.goto(link);
       await productPage.waitForNavigation();
       const pages = await browser.pages();
-      const detail = await pages[pages.length - 1].$$eval(
+      let detail = await pages[pages.length - 1].$$eval(
         'ul[class^="wt-text-body-01"] > li > div.wt-ml-xs-2, ul[class^="wt-text-body-01"] > li > div',
         (divs) => divs.map((d) => (d as HTMLDivElement).innerText)
       );
+      // remove empty strings
+      detail = detail.filter(text => !!text);
       productDetails.push(detail);
       productPage.close();
     }
 
     // console.log('total product links:', productLinks.length);
-    // console.log(productDetails, productDetails.length);
+    console.log(productDetails, productDetails.length);
 
-    // await browser.close();
-    // await chrome.kill();
+    await browser.close();
+    await chrome.kill();
   } catch (err) {
     console.error(err);
   }

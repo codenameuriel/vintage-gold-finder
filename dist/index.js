@@ -37,7 +37,7 @@ const axios_1 = __importDefault(require("axios"));
 const init = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const chrome = yield ChromeLauncher.launch({
-        // chromeFlags: ['--headless']
+            chromeFlags: ['--headless']
         });
         const response = yield axios_1.default.get(`http://localhost:${chrome.port}/json/version`);
         const { webSocketDebuggerUrl } = response.data;
@@ -76,14 +76,16 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
             productPage.goto(link);
             yield productPage.waitForNavigation();
             const pages = yield browser.pages();
-            const detail = yield pages[pages.length - 1].$$eval('ul[class^="wt-text-body-01"] > li > div.wt-ml-xs-2, ul[class^="wt-text-body-01"] > li > div', (divs) => divs.map((d) => d.innerText));
+            let detail = yield pages[pages.length - 1].$$eval('ul[class^="wt-text-body-01"] > li > div.wt-ml-xs-2, ul[class^="wt-text-body-01"] > li > div', (divs) => divs.map((d) => d.innerText));
+            // remove empty strings
+            detail = detail.filter(text => !!text);
             productDetails.push(detail);
             productPage.close();
         }
         // console.log('total product links:', productLinks.length);
-        // console.log(productDetails, productDetails.length);
-        // await browser.close();
-        // await chrome.kill();
+        console.log(productDetails, productDetails.length);
+        yield browser.close();
+        yield chrome.kill();
     }
     catch (err) {
         console.error(err);
