@@ -37,7 +37,7 @@ const axios_1 = __importDefault(require("axios"));
 const init = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const chrome = yield ChromeLauncher.launch({
-            chromeFlags: ['--headless']
+        // chromeFlags: ['--headless']
         });
         const response = yield axios_1.default.get(`http://localhost:${chrome.port}/json/version`);
         const { webSocketDebuggerUrl } = response.data;
@@ -57,7 +57,8 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
             height: 1200,
             deviceScaleFactor: 1
         });
-        yield page.goto('https://etsy.com/search/vintage?q=gold+jewelry');
+        page.goto('https://etsy.com/search/vintage?q=gold+jewelry');
+        yield page.waitForNavigation();
         const productLinks = yield page.$$eval('div[class~=search-listing-card--desktop] > a.listing-link', (aTags) => aTags.map((aTag) => aTag.href));
         // console.log(productLinks, productLinks.length)
         // filter out the '?version=[0-9]' characters from the end of the string
@@ -75,14 +76,14 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
             productPage.goto(link);
             yield productPage.waitForNavigation();
             const pages = yield browser.pages();
-            const detail = yield pages[pages.length - 1].$$eval('ul[class^="wt-text-body-01 jewelry-attributes"] > li > div', (divs) => divs.map((d) => d.innerText));
+            const detail = yield pages[pages.length - 1].$$eval('ul[class^="wt-text-body-01"] > li > div.wt-ml-xs-2, ul[class^="wt-text-body-01"] > li > div', (divs) => divs.map((d) => d.innerText));
             productDetails.push(detail);
             productPage.close();
         }
-        console.log('total product links:', productLinks.length);
-        console.log(productDetails, productDetails.length);
-        yield browser.close();
-        yield chrome.kill();
+        // console.log('total product links:', productLinks.length);
+        // console.log(productDetails, productDetails.length);
+        // await browser.close();
+        // await chrome.kill();
     }
     catch (err) {
         console.error(err);

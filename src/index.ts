@@ -5,7 +5,7 @@ import axios from 'axios';
 const init = async () => {
   try {
     const chrome = await ChromeLauncher.launch({
-      chromeFlags: ['--headless']
+      // chromeFlags: ['--headless']
     });
 
     const response = await axios.get(
@@ -23,7 +23,7 @@ const init = async () => {
 
     const page = await browser.newPage();
     const pages = await browser.pages();
-    
+
     // close default blank about page
     pages[0].close();
 
@@ -36,7 +36,9 @@ const init = async () => {
       deviceScaleFactor: 1
     });
 
-    await page.goto('https://etsy.com/search/vintage?q=gold+jewelry');
+    page.goto('https://etsy.com/search/vintage?q=gold+jewelry');
+
+    await page.waitForNavigation();
 
     const productLinks = await page.$$eval(
       'div[class~=search-listing-card--desktop] > a.listing-link',
@@ -69,7 +71,7 @@ const init = async () => {
     );
     // console.log(productPrices, productPrices.length);
 
-    const productDetails = [];
+    const productDetails: string[][] = [];
 
     // TESTING
     for (let link of productLinks) {
@@ -78,18 +80,18 @@ const init = async () => {
       await productPage.waitForNavigation();
       const pages = await browser.pages();
       const detail = await pages[pages.length - 1].$$eval(
-        'ul[class^="wt-text-body-01 jewelry-attributes"] > li > div',
+        'ul[class^="wt-text-body-01"] > li > div.wt-ml-xs-2, ul[class^="wt-text-body-01"] > li > div',
         (divs) => divs.map((d) => (d as HTMLDivElement).innerText)
       );
       productDetails.push(detail);
       productPage.close();
     }
 
-    console.log('total product links:', productLinks.length);
-    console.log(productDetails, productDetails.length);
+    // console.log('total product links:', productLinks.length);
+    // console.log(productDetails, productDetails.length);
 
-    await browser.close();
-    await chrome.kill();
+    // await browser.close();
+    // await chrome.kill();
   } catch (err) {
     console.error(err);
   }
