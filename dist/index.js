@@ -1,23 +1,3 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -27,14 +7,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const ChromeLauncher = __importStar(require("chrome-launcher"));
-const puppeteer_core_1 = __importDefault(require("puppeteer-core"));
-const axios_1 = __importDefault(require("axios"));
-const product_1 = require("./product");
+import * as ChromeLauncher from 'chrome-launcher';
+import puppeteer from 'puppeteer-core';
+import axios from 'axios';
+import { createProducts } from './product';
 // loggers
 const logComplete = () => console.log('Scraping complete!');
 const logScraping = (scrapeData) => console.log(`Scraping ${scrapeData}...`);
@@ -43,9 +19,9 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
         const chrome = yield ChromeLauncher.launch({
             chromeFlags: ['--headless']
         });
-        const response = yield axios_1.default.get(`http://localhost:${chrome.port}/json/version`);
+        const response = yield axios.get(`http://localhost:${chrome.port}/json/version`);
         const { webSocketDebuggerUrl } = response.data;
-        const browser = yield puppeteer_core_1.default.connect({
+        const browser = yield puppeteer.connect({
             browserWSEndpoint: webSocketDebuggerUrl
         });
         const isConnected = browser.isConnected();
@@ -91,7 +67,7 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
             productPage.close();
         }
         logComplete();
-        const productsData = product_1.createProducts(productNames, productLinks, productImages, productPrices, productDetails);
+        const productsData = createProducts(productNames, productLinks, productImages, productPrices, productDetails);
         console.log(productsData);
         yield browser.close();
         yield chrome.kill();

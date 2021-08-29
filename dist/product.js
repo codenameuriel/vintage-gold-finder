@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createProducts = void 0;
-const createProducts = (names, links, images, prices, details) => {
+export const createProducts = (names, links, images, prices, details) => {
     const products = {};
     for (let i = 0; i < names.length; i++) {
         const productName = names[i];
@@ -15,8 +12,7 @@ const createProducts = (names, links, images, prices, details) => {
     }
     return products;
 };
-exports.createProducts = createProducts;
-class Product {
+export default class Product {
     constructor(name, link, image, price, details) {
         this.name = name;
         this.link = link;
@@ -34,4 +30,3 @@ class Product {
         };
     }
 }
-exports.default = Product;
