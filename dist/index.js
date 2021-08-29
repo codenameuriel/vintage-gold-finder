@@ -34,6 +34,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const ChromeLauncher = __importStar(require("chrome-launcher"));
 const puppeteer_core_1 = __importDefault(require("puppeteer-core"));
 const axios_1 = __importDefault(require("axios"));
+const product_1 = require("./product");
 // loggers
 const logComplete = () => console.log('Scraping complete!');
 const logScraping = (scrapeData) => console.log(`Scraping ${scrapeData}...`);
@@ -74,7 +75,7 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
         logComplete();
         logScraping('product prices');
         // use css 'or' operator to select either available span element
-        const productPrices = yield page.$$eval('p.wt-text-title-01 > span[aria-hidden="true"] > span.currency-value, p.wt-text-title-01 > span.currency-value', (spanTags) => spanTags.map((spanTag) => spanTag.innerText));
+        const productPrices = yield page.$$eval('p.wt-text-title-01 > span[aria-hidden="true"] > span.currency-value, p.wt-text-title-01 > span.currency-value', (spanTags) => spanTags.map((spanTag) => parseFloat(spanTag.innerText)));
         logComplete();
         const productDetails = [];
         logScraping('product details');
@@ -85,12 +86,13 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
             const pages = yield browser.pages();
             let detail = yield pages[pages.length - 1].$$eval('ul[class^="wt-text-body-01"] > li > div.wt-ml-xs-2, ul[class^="wt-text-body-01"] > li > div', (divs) => divs.map((d) => d.innerText));
             // remove empty strings
-            detail = detail.filter(text => text);
+            detail = detail.filter((text) => text);
             productDetails.push(detail);
             productPage.close();
         }
         logComplete();
-        console.log(productDetails, productDetails.length);
+        const productsData = product_1.createProducts(productNames, productLinks, productImages, productPrices, productDetails);
+        console.log(productsData);
         yield browser.close();
         yield chrome.kill();
     }

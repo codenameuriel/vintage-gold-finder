@@ -1,10 +1,12 @@
 import * as ChromeLauncher from 'chrome-launcher';
 import puppeteer from 'puppeteer-core';
 import axios from 'axios';
+import Product, { createProducts } from './product';
 
 // loggers
 const logComplete = () => console.log('Scraping complete!');
-const logScraping = (scrapeData: string) => console.log(`Scraping ${scrapeData}...`);
+const logScraping = (scrapeData: string) =>
+  console.log(`Scraping ${scrapeData}...`);
 
 const init = async () => {
   try {
@@ -75,7 +77,7 @@ const init = async () => {
     const productPrices = await page.$$eval(
       'p.wt-text-title-01 > span[aria-hidden="true"] > span.currency-value, p.wt-text-title-01 > span.currency-value',
       (spanTags) =>
-        spanTags.map((spanTag) => (spanTag as HTMLSpanElement).innerText)
+        spanTags.map((spanTag) => parseFloat((spanTag as HTMLSpanElement).innerText))
     );
     logComplete();
 
@@ -92,12 +94,21 @@ const init = async () => {
         (divs) => divs.map((d) => (d as HTMLDivElement).innerText)
       );
       // remove empty strings
-      detail = detail.filter(text => text);
+      detail = detail.filter((text) => text);
       productDetails.push(detail);
       productPage.close();
     }
     logComplete();
-    console.log(productDetails, productDetails.length);
+
+    const productsData = createProducts(
+      productNames,
+      productLinks,
+      productImages,
+      productPrices,
+      productDetails
+    );
+
+    console.log(productsData);
 
     await browser.close();
     await chrome.kill();
